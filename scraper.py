@@ -14,3 +14,13 @@ lst = []
 product = re.sub(" ", "-", search)
 print(product)
 
+response = requests.get('https://lista.mercadolivre.com.br/' + product)
+
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# To search by class, use find_all(class_='something')
+prices = soup.find_all(class_='price-tag-fraction')
+
+# Extracting text from HTML
+for price in prices:
+    print(price.text)
