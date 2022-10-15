@@ -1,2 +1,2 @@
-# AMZ-WebScraper
+# ML-WebScraper
 Mercado Livre product price checker
