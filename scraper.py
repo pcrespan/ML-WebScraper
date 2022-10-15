@@ -6,6 +6,9 @@ from bs4 import BeautifulSoup
 # The search mechanism will be https://lista.mercadolivre.com.br/firstterm-secondterm
 # The spaces are represented by -
 
+# todo: add global input variable to store
+# search link template
+
 class Searcher:
     @staticmethod
     def search():
@@ -18,7 +21,7 @@ class Searcher:
         return re.sub(" ", "-", search)
 
 
-class Scraper(Searcher):
+class Scraper:
 
     @staticmethod
     def send(product):
@@ -34,14 +37,19 @@ class Scraper(Searcher):
     @staticmethod
     def extract_values(prices):
         for price in prices:
-            print(price.text)
+            yield price.text
 
 
 def main():
     product = Searcher.search()
     soup = Scraper.send(product)
     prices = Scraper.get_prices(soup)
-    Scraper.extract_values(prices)
+    values = []
+
+    for price in Scraper.extract_values(prices):
+        values.append(price)
+    
+    print(values)
 
 
 if __name__ == "__main__":
