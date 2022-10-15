@@ -6,21 +6,43 @@ from bs4 import BeautifulSoup
 # The search mechanism will be https://lista.mercadolivre.com.br/firstterm-secondterm
 # The spaces are represented by -
 
-search = input("What do you want to search for? ").strip().lower()
-print(search)
+class Searcher:
+    @staticmethod
+    def search():
+        search = input("Search: ").strip().lower()
+        product = Searcher.format_search(search)
+        return product
+    
+    @staticmethod
+    def format_search(search):
+        return re.sub(" ", "-", search)
 
-lst = []
 
-product = re.sub(" ", "-", search)
-print(product)
+class Scraper(Searcher):
 
-response = requests.get('https://lista.mercadolivre.com.br/' + product)
+    @staticmethod
+    def send(product):
+        response = requests.get('https://lista.mercadolivre.com.br/' + product)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        return soup
+        
+    @staticmethod
+    def get_prices(soup):
+        prices = soup.find_all(class_='price-tag-fraction')
+        return prices
+    
+    @staticmethod
+    def extract_values(prices):
+        for price in prices:
+            print(price.text)
 
-soup = BeautifulSoup(response.content, 'html.parser')
 
-# To search by class, use find_all(class_='something')
-prices = soup.find_all(class_='price-tag-fraction')
+def main():
+    product = Searcher.search()
+    soup = Scraper.send(product)
+    prices = Scraper.get_prices(soup)
+    Scraper.extract_values(prices)
 
-# Extracting text from HTML
-for price in prices:
-    print(price.text)
+
+if __name__ == "__main__":
+    main()
