@@ -1,6 +1,5 @@
 import requests
 import re
-import statistics
 from bs4 import BeautifulSoup
 
 # Need to look for price-tag-fraction on ML
@@ -52,6 +51,12 @@ class Scraper:
         for value in values:
             sum = sum + value
         return sum / len(values)
+    
+    @staticmethod
+    def next_page(soup):
+        btn = soup.find('a', class_='andes-pagination__link shops__pagination-link ui-search-link')
+        link = btn['href']
+        return link
 
 
 def main():
@@ -66,6 +71,9 @@ def main():
     print(sorted(values))
     
     print(f"The average price for {product} is R${Scraper.avg(values)}")
+    print(Scraper.next_page(soup))
+
+    # While next_page doesn't return False/None, do the loop and get the prices
 
 
 if __name__ == "__main__":
