@@ -52,6 +52,7 @@ class Scraper:
         pages = re.search(r'(\d)', total_pages.text)
         return int(pages.group(1))
 
+    # Redundancy, needs to be merged with get_prices somehow
     @staticmethod
     def extract_values(prices):
         for price in prices:
@@ -64,6 +65,7 @@ class Scraper:
             sum = sum + value
         return sum / len(values)
     
+    # Needs better design
     @staticmethod
     def next_page(soup, values, counter, pages):
         link = Scraper.get_btn_link(soup)
@@ -86,6 +88,7 @@ class Scraper:
 
 
 def main():
+    # Needs better design
     product = Searcher.search()
     soup = Scraper.send(product)
     prices = Scraper.get_prices(soup)
