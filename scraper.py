@@ -29,20 +29,24 @@ class Searcher:
 class Scraper:
 
     @staticmethod
-    def send(product):
+    def send(product='', link='https://lista.mercadolivre.com.br/'):
         # Mimicking browser
-        response = requests.get('https://lista.mercadolivre.com.br/' + product, headers=HEADERS)
+        response = requests.get(link + product, headers=HEADERS)
         soup = BeautifulSoup(response.content, 'html.parser')
-        total_pages = soup.find('li', class_='andes-pagination__page-count')
-        pages = re.search(r'(\d)', total_pages.text)
         print(response)
-        return soup, int(pages.group(1))
+        return soup
         
     @staticmethod
     def get_prices(soup):
         prices = soup.find_all(class_="price-tag-fraction")
         return prices
     
+    @staticmethod
+    def total_pages(soup):
+        total_pages = soup.find('li', class_='andes-pagination__page-count')
+        pages = re.search(r'(\d)', total_pages.text)
+        return int(pages.group(1))
+
     @staticmethod
     def extract_values(prices):
         for price in prices:
@@ -59,8 +63,7 @@ class Scraper:
     def next_page(soup, values, counter, pages):
         link = Scraper.get_btn_link(soup)
         if link:
-            response = requests.get(link, headers=HEADERS)
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = Scraper.send('', link)
             prices = Scraper.get_prices(soup)
             for value in Scraper.extract_values(prices):
                 values.append(value)
@@ -79,7 +82,7 @@ class Scraper:
 
 def main():
     product = Searcher.search()
-    soup, pages = Scraper.send(product)
+    soup = Scraper.send(product)
     prices = Scraper.get_prices(soup)
     values = []
 
@@ -92,9 +95,8 @@ def main():
 
     val = []
     counter = 1
+    pages = Scraper.total_pages(soup)
     print(sorted(Scraper.next_page(soup, val, counter, pages)))
-
-    # While next_page doesn't return False/None, do the loop and get the prices
 
 
 if __name__ == "__main__":
