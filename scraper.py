@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 # Need to look for price-tag-fraction on ML
 # The search mechanism will be https://lista.mercadolivre.com.br/firstterm-secondterm
 # The spaces are represented by -
+# Next button - andes-pagination__link shops__pagination-link ui-search-link
 
 # todo: add global input variable to store
 # search link template
@@ -19,7 +20,7 @@ class Searcher:
     
     @staticmethod
     def format_search(search):
-        return re.sub(" ", "+", search)
+        return re.sub(" ", "-", search)
 
 
 class Scraper:
@@ -62,7 +63,7 @@ def main():
     for price in Scraper.extract_values(prices):
         values.append(int((re.sub("\.", "", price))))
 
-    print(values)
+    print(sorted(values))
     
     print(f"The average price for {product} is R${Scraper.avg(values)}")
 
