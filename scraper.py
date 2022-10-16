@@ -38,7 +38,12 @@ class Scraper:
         
     @staticmethod
     def get_prices(soup):
-        prices = soup.find_all(class_="price-tag-fraction")
+        # Searching for all divs with main price, returns a list with soup objects
+        divs = soup.find_all('div', class_='ui-search-price ui-search-price--size-medium shops__price')
+        prices = []
+        # Iterating through all elements in the list of divs
+        for div in divs:
+            prices.append(div.find('span', class_='price-tag-fraction'))
         return prices
     
     @staticmethod
