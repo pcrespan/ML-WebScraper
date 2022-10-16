@@ -46,7 +46,7 @@ class Scraper:
     @staticmethod
     def extract_values(prices):
         for price in prices:
-            yield price.text
+            yield int(re.sub('\.', '', price.text))
         
     @staticmethod
     def avg(values):
@@ -84,7 +84,7 @@ def main():
     values = []
 
     for price in Scraper.extract_values(prices):
-        values.append(int((re.sub("\.", "", price))))
+        values.append(price)
 
     print(sorted(values))
     
