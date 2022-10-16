@@ -10,6 +10,10 @@ from bs4 import BeautifulSoup
 # todo: add global input variable to store
 # search link template
 
+HEADERS = ({'User-Agent':
+            'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
+            'Accept-Language': 'en-US, en;q=0.5'})
+
 class Searcher:
     @staticmethod
     def search():
@@ -27,13 +31,12 @@ class Scraper:
     @staticmethod
     def send(product):
         # Mimicking browser
-        HEADERS = ({'User-Agent':
-            'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
-            'Accept-Language': 'en-US, en;q=0.5'})
         response = requests.get('https://lista.mercadolivre.com.br/' + product, headers=HEADERS)
         soup = BeautifulSoup(response.content, 'html.parser')
+        total_pages = soup.find('li', class_='andes-pagination__page-count')
+        pages = re.search(r'(\d)', total_pages.text)
         print(response)
-        return soup
+        return soup, int(pages.group(1))
         
     @staticmethod
     def get_prices(soup):
@@ -53,7 +56,22 @@ class Scraper:
         return sum / len(values)
     
     @staticmethod
-    def next_page(soup):
+    def next_page(soup, values, counter, pages):
+        link = Scraper.get_btn_link(soup)
+        if link:
+            response = requests.get(link, headers=HEADERS)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            prices = Scraper.get_prices(soup)
+            for value in Scraper.extract_values(prices):
+                values.append(value)
+            counter += 1
+            if counter <= pages:
+                Scraper.next_page(soup, values, counter, pages)
+        return values
+            
+    
+    @staticmethod
+    def get_btn_link(soup):
         btn = soup.find('a', class_='andes-pagination__link shops__pagination-link ui-search-link')
         link = btn['href']
         return link
@@ -61,7 +79,7 @@ class Scraper:
 
 def main():
     product = Searcher.search()
-    soup = Scraper.send(product)
+    soup, pages = Scraper.send(product)
     prices = Scraper.get_prices(soup)
     values = []
 
@@ -71,7 +89,10 @@ def main():
     print(sorted(values))
     
     print(f"The average price for {product} is R${Scraper.avg(values)}")
-    print(Scraper.next_page(soup))
+
+    val = []
+    counter = 1
+    print(sorted(Scraper.next_page(soup, val, counter, pages)))
 
     # While next_page doesn't return False/None, do the loop and get the prices
 
