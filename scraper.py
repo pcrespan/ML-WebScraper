@@ -1,5 +1,7 @@
 import requests
 import re
+import sys
+import logging
 from bs4 import BeautifulSoup
 
 # Host on Heroku or PythonAnywhere - in the case the user wants to use the "remind me" function
@@ -10,6 +12,9 @@ from bs4 import BeautifulSoup
 
 # todo: add global input variable to store
 # search link template
+
+# Configuring logging
+logging.basicConfig(level=logging.INFO)
 
 # Global variable to mimic browser behavior
 HEADERS = ({'User-Agent':
@@ -44,7 +49,7 @@ class Scraper:
         soup = BeautifulSoup(response.content, 'html.parser')
         print(response)
         # Returning soup object
-        return soup
+        return soup, response
 
 
     # Gets all the prices of the current page, returns a list
@@ -72,7 +77,7 @@ class Scraper:
         # Finding number of pages
         total_pages = soup.find('li', class_='andes-pagination__page-count')
         # Cleaning text and returning in the form of an integer
-        pages = re.search(r'(\d)', total_pages.text)
+        pages = re.search(r'(\d+)', total_pages.text)
         return int(pages.group(1))
         
 
@@ -91,7 +96,12 @@ class Scraper:
         # Getting the link for next page, sending request
         # to it and returning soup object that will look for prices
         link = Scraper.get_btn_link(soup)
-        soup = Scraper.send('', link)
+        soup, response = Scraper.send('', link)
+        # Checking if HTTP response is valid
+        if Scraper.valid_response(response):
+            pass
+        else:
+            sys.exit(1)
         # get_prices returns a list of prices of each page - one at a time - 
         # and the for loop appends each element to the existing list values
         for value in Scraper.get_prices(soup):
@@ -115,15 +125,39 @@ class Scraper:
         link = btn['href']
         return link
     
+    
+    @staticmethod
+    def valid_response(response):
+        # Checking for request errors
+        match response.status_code:
+            case 200:
+                logging.info('Success')
+                return True
+            case 404:
+                logging.error('Product not found. Exitting...')
+                return False
+            case 503:
+                logging.error('Server error')
+                return False
+    
+
     @staticmethod
     def scrape():
         # Defining page counter
         counter = 1
 
         product = Searcher.search()
-        soup = Scraper.send(product)
+        soup, response = Scraper.send(product)
+
+        # Testing HTTP response for first request
+        if Scraper.valid_response(response):
+            pass
+        else:
+            sys.exit(1)
+
         pages = Scraper.total_pages(soup)
         prices = Scraper.get_prices(soup)
+        # Automatically tests for HTTP response on every next page
         print(Scraper.next_page(soup, prices, counter, pages))
         print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
