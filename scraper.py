@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 # Host on Heroku or PythonAnywhere - in the case the user wants to use the "remind me" function
 # Need to look for price-tag-fraction on ML
-# The search mechanism will be https://lista.mercadolivre.com.br/firstterm-secondterm
+# The search mechanism will be https://lista.mercadolivre.com.br/<something>
 # The spaces are represented by -
 # Next button - andes-pagination__link shops__pagination-link ui-search-link
 
@@ -159,9 +159,16 @@ class Scraper:
             sys.exit(1)
 
         pages = Scraper.total_pages(soup)
+        page_amount = input(f'Found {pages} pages. How many of them should be scraped for prices? (Default: 1) ').strip()
+
+        # Also need to test if user inputted text
+        if not page_amount:
+            page_amount = 1
+
+        page_amount = int(page_amount) - 1
         prices = Scraper.get_prices(soup)
         # Automatically tests for HTTP response on every next page
-        print(Scraper.next_page(soup, prices, counter, pages))
+        print(Scraper.next_page(soup, prices, counter, page_amount))
         print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
 
