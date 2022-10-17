@@ -99,11 +99,12 @@ class Scraper:
         # Increasing counter that represent the page number
         counter += 1
         # Checking if all pages have been scraped, if not, call function
-        # to check for prices on the next page
-        if counter <= pages:
+        # to check for prices on the next page. Pages minus one because
+        # it already scraped the prices from the first page
+        if counter <= pages - 1:
             Scraper.next_page(soup, values, counter, pages)
         # Return list of prices
-        return values
+        return sorted(values)
             
     # Captures link for next page, returns string
     @staticmethod
@@ -120,14 +121,12 @@ def main():
     product = Searcher.search()
     soup = Scraper.send(product)
     prices = Scraper.get_prices(soup)
-    print(sorted(prices))
-    print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
     # Next pages
-    val = []
     counter = 1
     pages = Scraper.total_pages(soup)
-    print(sorted(Scraper.next_page(soup, val, counter, pages)))
+    print(Scraper.next_page(soup, prices, counter, pages))
+    print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
 
 if __name__ == "__main__":
