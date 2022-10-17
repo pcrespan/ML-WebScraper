@@ -10,7 +10,10 @@ from bs4 import BeautifulSoup
 # The spaces are represented by -
 # Next button - andes-pagination__link shops__pagination-link ui-search-link
 
-# todo: add global input variable to store
+# todo: ALLOW USER TO SPECIFY HOW MANY PAGES THEY WANT TO SEARCH
+# todo: SEARCH FOR MINIMUM AND MAXIMUM PRICES
+# todo: DISPLAY LINK AND TITLE FOR FOUND RESULTS
+# todo: ALLOW TO SEARCH BY REVIEWS
 # search link template
 
 # Configuring logging
@@ -126,9 +129,9 @@ class Scraper:
         return link
     
     
+    # Checks for request errors, returns boolean
     @staticmethod
     def valid_response(response):
-        # Checking for request errors
         match response.status_code:
             case 200:
                 logging.info('Success')
