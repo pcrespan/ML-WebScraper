@@ -165,7 +165,7 @@ class Scraper:
         if not page_amount:
             page_amount = 1
 
-        page_amount = int(page_amount) - 1
+        page_amount = int(page_amount)
         prices = Scraper.get_prices(soup)
         # Automatically tests for HTTP response on every next page
         print(Scraper.next_page(soup, prices, counter, page_amount))
