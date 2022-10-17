@@ -42,8 +42,10 @@ class Scraper:
         divs = soup.find_all('div', class_='ui-search-price ui-search-price--size-medium shops__price')
         prices = []
         # Iterating through all elements in the list of divs
+        price_str = ''
         for div in divs:
-            prices.append(div.find('span', class_='price-tag-fraction'))
+            price_str = div.find('span', class_='price-tag-fraction')
+            prices.append(int(re.sub('\.', '', price_str.text)))
         return prices
     
     @staticmethod
@@ -51,12 +53,6 @@ class Scraper:
         total_pages = soup.find('li', class_='andes-pagination__page-count')
         pages = re.search(r'(\d)', total_pages.text)
         return int(pages.group(1))
-
-    # Redundancy, needs to be merged with get_prices somehow
-    @staticmethod
-    def extract_values(prices):
-        for price in prices:
-            yield int(re.sub('\.', '', price.text))
         
     @staticmethod
     def avg(values):
@@ -72,7 +68,7 @@ class Scraper:
         if link:
             soup = Scraper.send('', link)
             prices = Scraper.get_prices(soup)
-            for value in Scraper.extract_values(prices):
+            for value in prices:
                 values.append(value)
             counter += 1
             if counter <= pages:
@@ -92,14 +88,10 @@ def main():
     product = Searcher.search()
     soup = Scraper.send(product)
     prices = Scraper.get_prices(soup)
-    values = []
 
-    for price in Scraper.extract_values(prices):
-        values.append(price)
-
-    print(sorted(values))
+    print(sorted(prices))
     
-    print(f"The average price for {product} is R${Scraper.avg(values)}")
+    print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
     val = []
     counter = 1
