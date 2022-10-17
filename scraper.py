@@ -114,19 +114,22 @@ class Scraper:
         # Storing link for next page
         link = btn['href']
         return link
+    
+    @staticmethod
+    def scrape():
+        # Defining page counter
+        counter = 1
+
+        product = Searcher.search()
+        soup = Scraper.send(product)
+        pages = Scraper.total_pages(soup)
+        prices = Scraper.get_prices(soup)
+        print(Scraper.next_page(soup, prices, counter, pages))
+        print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
 
 def main():
-    # First page
-    product = Searcher.search()
-    soup = Scraper.send(product)
-    prices = Scraper.get_prices(soup)
-
-    # Next pages
-    counter = 1
-    pages = Scraper.total_pages(soup)
-    print(Scraper.next_page(soup, prices, counter, pages))
-    print(f"The average price for {product} is R${Scraper.avg(prices)}")
+    Scraper.scrape()
 
 
 if __name__ == "__main__":
