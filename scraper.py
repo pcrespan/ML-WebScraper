@@ -160,13 +160,15 @@ class Scraper:
 
         pages = Scraper.total_pages(soup)
         page_amount = input(f'Found {pages} pages. How many of them should be scraped for prices? (Default: 1) ').strip()
-
-        # Also need to test if user inputted text
-        if not page_amount:
-            page_amount = 1
-
-        page_amount = int(page_amount)
         prices = Scraper.get_prices(soup)
+
+        if not page_amount:
+            print(sorted(prices))
+            print(f"The average price for {product} is R${Scraper.avg(prices)}")
+            return
+        
+        page_amount = int(page_amount)
+
         # Automatically tests for HTTP response on every next page
         print(Scraper.next_page(soup, prices, counter, page_amount))
         print(f"The average price for {product} is R${Scraper.avg(prices)}")
