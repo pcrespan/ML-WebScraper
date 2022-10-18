@@ -4,17 +4,15 @@ import sys
 import logging
 from bs4 import BeautifulSoup
 
-# Host on Heroku or PythonAnywhere - in the case the user wants to use the "remind me" function
+
 # Need to look for price-tag-fraction on ML
 # The search mechanism will be https://lista.mercadolivre.com.br/<something>
 # The spaces are represented by -
 # Next button - andes-pagination__link shops__pagination-link ui-search-link
 
-# todo: ALLOW USER TO SPECIFY HOW MANY PAGES THEY WANT TO SEARCH
-# todo: SEARCH FOR MINIMUM AND MAXIMUM PRICES
-# todo: DISPLAY LINK AND TITLE FOR FOUND RESULTS
-# todo: ALLOW TO SEARCH BY REVIEWS
-# search link template
+# todo: ALLOW USER TO SPECIFY HOW MANY PAGES THEY WANT TO SEARCH - done
+# todo: DISPLAY LINK AND TITLE FOR MAX AND MIN PRICES
+
 
 # Configuring logging
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +30,8 @@ class Searcher:
         # Formatting input and returning string
         product = Searcher.format_search(search)
         return product
-    
+
+
     # Formats user input
     @staticmethod
     def format_search(search):
@@ -44,6 +43,7 @@ class Scraper:
     def __init__(self, product, prices=None):
         self.product = product
         self.prices = prices
+
 
     # Sends request for specific link, returns soup object
     @staticmethod
@@ -111,6 +111,7 @@ class Scraper:
             if input == '1' or not input:
                 print('Using default value...')
                 self.show_prices()
+                self.lowest_highest_prices()
                 sys.exit(0)
             return True
 
@@ -132,10 +133,7 @@ class Scraper:
         link = Scraper.get_btn_link(soup)
         soup, response = Scraper.send('', link)
         # Checking if HTTP response is valid
-        if Scraper.valid_response(response):
-            pass
-        else:
-            sys.exit(1)
+        Scraper.valid_response(response)
         # get_prices returns a list of prices of each page - one at a time - 
         # and the for loop appends each element to the existing list values
         for value in Scraper.get_prices(soup):
@@ -161,25 +159,58 @@ class Scraper:
         return link
     
     
+    # Possible redundancy
     # Checks for request errors, returns boolean
     @staticmethod
     def valid_response(response):
         match response.status_code:
             case 200:
                 logging.info('Success')
-                return True
             case 404:
                 logging.error('Product not found. Exitting...')
-                return False
+                sys.exit(1)
             case 503:
                 logging.error('Server error')
-                return False
+                sys.exit(1)
     
 
     # Prints all prices and average price
     def show_prices(self):
         print(sorted(self.prices))
-        print(f"The average price for {self.product} is R${Scraper.avg(self.prices)}")
+        print(f'The average price for {self.product} is R${Scraper.avg(self.prices)}')
+
+    
+    # Finds max and min prices
+    def lowest_highest_prices(self):
+        links = []
+        links.append('https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE_NoIndex_True')
+        links.append('https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE*DESC_NoIndex_True')
+
+        product_list = []
+        product_info = {}
+
+        for link in links:
+            soup, response = Scraper.send('', link)
+            Scraper.valid_response(response)
+            info = soup.find('a', class_= 'ui-search-result__content ui-search-link')
+            product_link = info['href']
+            product_title = info['title']
+            div = soup.find('div', class_='ui-search-price ui-search-price--size-medium shops__price')
+            price_str = div.find('span', class_= 'price-tag-fraction')
+            price = int(re.sub('\.', '', price_str.text))
+
+            product_info = {
+                'title': product_title,
+                'link': product_link,
+                'price': price
+            }
+
+            product_list.append(product_info)
+
+            for product in product_list:
+                print(product['link'])
+                print(product['title'])
+                print(product['price'])
 
 
     # Execute all functions
@@ -187,8 +218,7 @@ class Scraper:
         product = self.product
         soup, response = Scraper.send(product)
         # Testing HTTP response for first request
-        if not Scraper.valid_response(response):
-            sys.exit(1)
+        Scraper.valid_response(response)
         # Storing prices of first page
         self.prices = Scraper.get_prices(soup)
         # Storing how many pages the user want
@@ -198,6 +228,7 @@ class Scraper:
         # all pages, getting prices of each one
         counter = 1
         Scraper.next_page(soup, self.prices, counter, pages)
+        self.lowest_highest_prices()
         self.show_prices()
 
 
