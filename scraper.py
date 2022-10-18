@@ -145,33 +145,33 @@ class Scraper:
     
 
     @staticmethod
-    def scrape():
-        # Defining page counter
-        counter = 1
+    def show_prices(product, prices):
+        print(sorted(prices))
+        print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
+
+    @staticmethod
+    def scrape():
         product = Searcher.search()
         soup, response = Scraper.send(product)
 
         # Testing HTTP response for first request
-        if Scraper.valid_response(response):
-            pass
-        else:
+        if not Scraper.valid_response(response):
             sys.exit(1)
 
+        # Defining page counter
+        counter = 1
         pages = Scraper.total_pages(soup)
         page_amount = input(f'Found {pages} pages. How many of them should be scraped for prices? (Default: 1) ').strip()
         prices = Scraper.get_prices(soup)
 
         if not page_amount:
-            print(sorted(prices))
-            print(f"The average price for {product} is R${Scraper.avg(prices)}")
+            Scraper.show_prices(product, prices)
             return
         
         page_amount = int(page_amount)
-
         # Automatically tests for HTTP response on every next page
         print(Scraper.next_page(soup, prices, counter, page_amount))
-        print(f"The average price for {product} is R${Scraper.avg(prices)}")
 
 
 def main():
