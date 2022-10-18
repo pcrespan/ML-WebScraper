@@ -40,6 +40,11 @@ class Searcher:
 
 
 class Scraper:
+    # Initializer
+    def __init__(self, product, prices=None):
+        self.product = product
+        self.prices = prices
+
     # Sends request for specific link, returns soup object
     @staticmethod
     def send(product='', link='https://lista.mercadolivre.com.br/'):
@@ -75,15 +80,16 @@ class Scraper:
     
 
     # Finds the total number of pages, returns an integer
-    @staticmethod
-    def total_pages(soup, product, prices):
+    def total_pages(self, soup):
         # Finding number of pages
         total_pages = soup.find('li', class_='andes-pagination__page-count')
         # Cleaning text and returning in the form of an integer
         pages = re.search(r'(\d+)', total_pages.text)
-        page_amount = input(f'Found {pages.group(1)} pages. How many of them should be scraped for prices? (Default: 1) ').strip()
-        if not page_amount:
-            Scraper.show_prices(product, prices)
+        page_amount = input(f'Found {pages.group(1)} pages. Select amount to scrape (Default: 1) ').strip()
+        # Need to fix this
+        if not page_amount or page_amount == '1' or page_amount.isalpha() or int(page_amount) <= 0 or int(page_amount) > int(pages.group(1)):
+            print('Using default value...')
+            self.show_prices()
             sys.exit(0)
         return int(page_amount)
         
@@ -148,15 +154,13 @@ class Scraper:
                 return False
     
 
-    @staticmethod
-    def show_prices(product, prices):
-        print(sorted(prices))
-        print(f"The average price for {product} is R${Scraper.avg(prices)}")
+    def show_prices(self):
+        print(sorted(self.prices))
+        print(f"The average price for {self.product} is R${Scraper.avg(self.prices)}")
 
 
-    @staticmethod
-    def scrape():
-        product = Searcher.search()
+    def scrape(self):
+        product = self.product
         soup, response = Scraper.send(product)
 
         # Testing HTTP response for first request
@@ -165,15 +169,18 @@ class Scraper:
 
         # Defining page counter
         counter = 1
-        prices = Scraper.get_prices(soup)
-        pages = Scraper.total_pages(soup, product, prices)
+        self.prices = Scraper.get_prices(soup)
+        pages = self.total_pages(soup)
         
         # Automatically tests for HTTP response on every next page
-        Scraper.show_prices(product, Scraper.next_page(soup, prices, counter, pages))
+        Scraper.next_page(soup, self.prices, counter, pages)
+        self.show_prices()
 
 
 def main():
-    Scraper.scrape()
+    product = Searcher.search()
+    scraper = Scraper(product)
+    scraper.scrape()
 
 
 if __name__ == "__main__":
