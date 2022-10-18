@@ -76,12 +76,16 @@ class Scraper:
 
     # Finds the total number of pages, returns an integer
     @staticmethod
-    def total_pages(soup):
+    def total_pages(soup, product, prices):
         # Finding number of pages
         total_pages = soup.find('li', class_='andes-pagination__page-count')
         # Cleaning text and returning in the form of an integer
         pages = re.search(r'(\d+)', total_pages.text)
-        return int(pages.group(1))
+        page_amount = input(f'Found {pages.group(1)} pages. How many of them should be scraped for prices? (Default: 1) ').strip()
+        if not page_amount:
+            Scraper.show_prices(product, prices)
+            sys.exit(0)
+        return int(page_amount)
         
 
     # Calculates average price, returns a float
@@ -161,17 +165,11 @@ class Scraper:
 
         # Defining page counter
         counter = 1
-        pages = Scraper.total_pages(soup)
-        page_amount = input(f'Found {pages} pages. How many of them should be scraped for prices? (Default: 1) ').strip()
         prices = Scraper.get_prices(soup)
-
-        if not page_amount:
-            Scraper.show_prices(product, prices)
-            return
+        pages = Scraper.total_pages(soup, product, prices)
         
-        page_amount = int(page_amount)
         # Automatically tests for HTTP response on every next page
-        print(Scraper.next_page(soup, prices, counter, page_amount))
+        Scraper.show_prices(product, Scraper.next_page(soup, prices, counter, pages))
 
 
 def main():
