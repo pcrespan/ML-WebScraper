@@ -85,14 +85,35 @@ class Scraper:
         total_pages = soup.find('li', class_='andes-pagination__page-count')
         # Cleaning text and returning in the form of an integer
         pages = re.search(r'(\d+)', total_pages.text)
-        page_amount = input(f'Found {pages.group(1)} pages. Select amount to scrape (Default: 1) ').strip()
-        # Need to fix this
-        if not page_amount or page_amount == '1' or page_amount.isalpha() or int(page_amount) <= 0 or int(page_amount) > int(pages.group(1)):
-            print('Using default value...')
-            self.show_prices()
-            sys.exit(0)
+        # Waiting for user input. If it's invalid, prompt it again
+        while True:
+            page_amount = input(
+                f'Found {pages.group(1)} pages. Select amount to scrape (Default: 1) '
+                ).strip()
+            # Checking for user input. If it's valid,
+            # break from loop and return number of pages
+            if self.check_input(page_amount, pages):
+                break
         return int(page_amount)
-        
+
+
+    # Checks for user input. Returns false for invalid
+    # input and True for inputs valid and different from one
+    def check_input(self, input, pages):
+        # Checking if input is not empty, is not a character
+        # and is not bigger than the total amount of pages found
+        if input and (input.isalpha() or int(input) <= 0 or int(input) > int(pages.group(1))):
+            print('Invalid input. Try again.')
+            return False
+        else:
+            # Testing for the case the input is equal 
+            # to the default value or empty
+            if input == '1' or not input:
+                print('Using default value...')
+                self.show_prices()
+                sys.exit(0)
+            return True
+
 
     # Calculates average price, returns a float
     @staticmethod
@@ -129,6 +150,7 @@ class Scraper:
         # Return list of prices
         return sorted(values)
             
+            
     # Captures link for next page, returns string
     @staticmethod
     def get_btn_link(soup):
@@ -154,11 +176,13 @@ class Scraper:
                 return False
     
 
+    # Prints all prices and average price
     def show_prices(self):
         print(sorted(self.prices))
         print(f"The average price for {self.product} is R${Scraper.avg(self.prices)}")
 
 
+    # Execute all functions
     def scrape(self):
         product = self.product
         soup, response = Scraper.send(product)
