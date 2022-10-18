@@ -186,17 +186,17 @@ class Scraper:
     def scrape(self):
         product = self.product
         soup, response = Scraper.send(product)
-
         # Testing HTTP response for first request
         if not Scraper.valid_response(response):
             sys.exit(1)
-
-        # Defining page counter
-        counter = 1
+        # Storing prices of first page
         self.prices = Scraper.get_prices(soup)
+        # Storing how many pages the user want
+        # to scrape for prices
         pages = self.total_pages(soup)
-        
-        # Automatically tests for HTTP response on every next page
+        # Defining page counter and iterating through 
+        # all pages, getting prices of each one
+        counter = 1
         Scraper.next_page(soup, self.prices, counter, pages)
         self.show_prices()
 
