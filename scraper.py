@@ -24,9 +24,9 @@ HEADERS = ({'User-Agent':
 
 class Searcher:
     @staticmethod
-    def search():
+    def search(raw_string):
         # Asking for product
-        search = input("Search: ").strip().lower()
+        search = raw_string.strip().lower()
         # Formatting input and returning string
         product = Searcher.format_search(search)
         return product
@@ -242,8 +242,8 @@ class Scraper:
         self.lowest_highest_prices()
 
 
-def main():
-    product = Searcher.search()
+def main(GUIstring):
+    product = Searcher.search(GUIstring)
     scraper = Scraper(product)
     scraper.scrape()
 
