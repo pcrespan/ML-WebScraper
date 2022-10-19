@@ -43,6 +43,7 @@ class Scraper:
     def __init__(self, product, prices=None):
         self.product = product
         self.prices = prices
+        # Links for lowest and highest prices
         self.links = [
             'https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE_NoIndex_True',
             'https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE*DESC_NoIndex_True'
@@ -184,27 +185,37 @@ class Scraper:
 
     
     # NEEDS BETTER DESIGN
-    # Finds max and min prices
+    # Finds max and min prices, prints product information
     def lowest_highest_prices(self):
-
+        print('Lowest and highest prices related to your search: ')
+        # Creating dictionary that will store
+        # product information
         product_info = {}
-
+        # Iterating through list of links (class attribute)
         for link in self.links:
+            # Sending request and returning soup object
+            # to search for all the information needed
             soup, response = Scraper.send('', link)
+            # Checking HTTP response
             Scraper.valid_response(response)
+            # Finding HTML element that contains product
+            # information (link and title)
             info = soup.find('a', class_= 'ui-search-result__content ui-search-link')
             product_link = info['href']
             product_title = info['title']
+            # Finding div that contains product price
             div = soup.find('div', class_='ui-search-price ui-search-price--size-medium shops__price')
+            # Searching inside of div to find span that
+            # stores product price and cleaning output
             price_str = div.find('span', class_= 'price-tag-fraction')
             price = int(re.sub('\.', '', price_str.text))
-
+            # Storing product information inside of dict
             product_info = {
                 'title': product_title,
                 'link': product_link,
                 'price': price
             }
-
+            # Printing product info
             print(f'Link: {product_info["link"]}')
             print(f'Product: {product_info["title"]}')
             print(f'Price: {product_info["price"]}')
@@ -228,7 +239,6 @@ class Scraper:
         # Getting lowest and highest prices for the product
         # and showing the average price
         self.show_prices()
-        print('Lowest and highest prices related to your search: ')
         self.lowest_highest_prices()
 
 
