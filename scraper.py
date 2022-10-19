@@ -43,6 +43,10 @@ class Scraper:
     def __init__(self, product, prices=None):
         self.product = product
         self.prices = prices
+        self.links = [
+            'https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE_NoIndex_True',
+            'https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE*DESC_NoIndex_True'
+        ]
 
 
     # Sends request for specific link, returns soup object
@@ -174,22 +178,18 @@ class Scraper:
                 sys.exit(1)
     
 
-    # Prints all prices and average price
+    # Prints average price
     def show_prices(self):
-        print(sorted(self.prices))
         print(f'The average price for {self.product} is R${Scraper.avg(self.prices)}')
 
     
+    # NEEDS BETTER DESIGN
     # Finds max and min prices
     def lowest_highest_prices(self):
-        links = []
-        links.append('https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE_NoIndex_True')
-        links.append('https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE*DESC_NoIndex_True')
 
-        product_list = []
         product_info = {}
 
-        for link in links:
+        for link in self.links:
             soup, response = Scraper.send('', link)
             Scraper.valid_response(response)
             info = soup.find('a', class_= 'ui-search-result__content ui-search-link')
@@ -205,12 +205,9 @@ class Scraper:
                 'price': price
             }
 
-            product_list.append(product_info)
-
-            for product in product_list:
-                print(product['link'])
-                print(product['title'])
-                print(product['price'])
+            print(f'Link: {product_info["link"]}')
+            print(f'Product: {product_info["title"]}')
+            print(f'Price: {product_info["price"]}')
 
 
     # Execute all functions
@@ -228,8 +225,11 @@ class Scraper:
         # all pages, getting prices of each one
         counter = 1
         Scraper.next_page(soup, self.prices, counter, pages)
-        self.lowest_highest_prices()
+        # Getting lowest and highest prices for the product
+        # and showing the average price
         self.show_prices()
+        print('Lowest and highest prices related to your search: ')
+        self.lowest_highest_prices()
 
 
 def main():
