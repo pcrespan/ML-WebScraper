@@ -20,14 +20,33 @@ class MLWebScraper(tk.Frame):
         scraper = Scraper(str(searchText.get()))   
         soup, response = Scraper.send(str(searchText.get()))
         Scraper.valid_response(response)
-        pages = scraper.total_pages(soup)
         # After executed, create new widgets
-        self.pageLabel = tk.Label(self, text = f'Found {pages} pages. How many should be scraped? (Default: 1) ', textvariable = pages)
-        self.pageField = tk.Entry(self)
-        self.pageButton = tk.Button(self, text = 'Select')
+        page_number = tk.StringVar()
+        text_label = tk.StringVar()
+        scraper.page_input = page_number.get()
+        scraper.pages = scraper.total_pages(soup)
+        scraper.prices = scraper.get_prices(soup)
+
+        self.pageLabel = tk.Label(self, text = f'Found {scraper.pages} pages. How many should be scraped? (Default: 1) ', textvariable = text_label)
+        self.pageField = tk.Entry(self, textvariable = page_number)
+        self.pageButton = tk.Button(self, text = 'Select', command = lambda : self.validate_input(scraper))
+
         self.pageLabel.grid()
         self.pageField.grid()
         self.pageButton.grid()
+
+
+    def validate_input(self, scraper):
+        while True:
+            if scraper.check_input(scraper.page_input, scraper.pages):
+                self.pageLabel.grid_remove()
+                self.pageField.grid_remove()
+                self.pageButton.grid_remove()
+                break
+            else:
+                self.text_label.set("Invalid input. Try again.")
+
+
 
     def createWidgets(self):
         # Quit button

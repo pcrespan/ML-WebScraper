@@ -48,6 +48,8 @@ class Scraper:
             'https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE_NoIndex_True',
             'https://lista.mercadolivre.com.br/' + self.product + '_OrderId_PRICE*DESC_NoIndex_True'
         ]
+        self.pages = None
+        self.page_input = None
 
 
     # Sends request for specific link, returns soup object
@@ -105,6 +107,7 @@ class Scraper:
         else:
             # Testing for the case the input is equal 
             # to the default value or empty
+            print(input)
             if input == '1' or not input:
                 print('Using default value...')
                 self.show_prices()
