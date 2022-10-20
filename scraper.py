@@ -237,8 +237,8 @@ class Scraper:
         self.lowest_highest_prices()
 
 
-def main(GUIstring):
-    product = Searcher.search(GUIstring)
+def main():
+    product = Searcher.search()
     scraper = Scraper(product)
     scraper.scrape()
 

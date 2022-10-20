@@ -10,6 +10,7 @@ from tkinter import *
 # Instead of grid_forget(), use grid_remove(), because
 # it will remember all of the parameters
 
+
 class MLWebScraper(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
