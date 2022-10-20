@@ -30,7 +30,7 @@ class MLWebScraper(tk.Frame):
 
         self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
         self.pageField = tk.Entry(self, text = "", textvariable = page_number)
-        self.pageButton = tk.Button(self, text = "Select", command = lambda : self.validate_input(scraper, page_number, soup, text_label))
+        self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
 
         self.pageLabel.grid()
         self.pageField.grid()
@@ -40,10 +40,18 @@ class MLWebScraper(tk.Frame):
     def callback(url):
         webbrowser.open_new(url)
 
-    def validate_input(self, scraper, page_number, soup, text_label, counter = 1):
+
+    def validate_input(self, scraper, page_number):
         scraper.page_input = page_number.get()
+        if scraper.check_input(page_number.get(), scraper.pages):
+            return True
+        else:
+            return False
+
+
+    def scrape(self, scraper, page_number, soup, text_label, counter = 1):
         while True:
-            if scraper.check_input(page_number.get(), scraper.pages):
+            if self.validate_input(scraper, page_number):
                 self.pageLabel.grid_remove()
                 self.pageField.grid_remove()
                 self.pageButton.grid_remove()
@@ -53,7 +61,8 @@ class MLWebScraper(tk.Frame):
             else:
                 text_label.set("Invalid input. Try again.")
                 break
-        
+
+
     def getLowHighPrices(self, scraper):
         labelList = []
         links = []
