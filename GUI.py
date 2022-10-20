@@ -26,7 +26,7 @@ class MLWebScraper(tk.Frame):
         scraper.pages = scraper.total_pages(soup)
         scraper.prices = scraper.get_prices(soup)
 
-        self.pageLabel = tk.Label(self, text = f"Found {scraper.pages} pages. How many should be scraped? (Default: 1) ", textvariable = text_label)
+        self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
         self.pageField = tk.Entry(self, text = "", textvariable = page_number)
         self.pageButton = tk.Button(self, text = "Select", command = lambda : self.validate_input(scraper, page_number, soup, text_label))
 
