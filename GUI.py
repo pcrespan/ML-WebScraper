@@ -48,6 +48,7 @@ class MLWebScraper(tk.Frame):
                 break
             else:
                 text_label.set("Invalid input. Try again.")
+                break
 
 
     def createWidgets(self):
