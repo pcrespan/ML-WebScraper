@@ -91,15 +91,7 @@ class Scraper:
         # Cleaning text and returning in the form of an integer
         pages = re.search(r'(\d+)', total_pages.text)
         # Waiting for user input. If it's invalid, prompt it again
-        while True:
-            page_amount = input(
-                f'Found {pages.group(1)} pages. Select amount to scrape (Default: 1) '
-                ).strip()
-            # Checking for user input. If it's valid,
-            # break from loop and return number of pages
-            if self.check_input(page_amount, pages):
-                break
-        return int(page_amount)
+        return int(pages.group(1))
 
 
     # Checks for user input. Returns false for invalid
