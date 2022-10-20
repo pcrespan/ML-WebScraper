@@ -101,7 +101,7 @@ class Scraper:
     def check_input(self, input, pages):
         # Checking if input is not empty, is not a character
         # and is not bigger than the total amount of pages found
-        if input and (input.isalpha() or int(input) <= 0 or int(input) > int(pages.group(1))):
+        if input and (input.isalpha() or int(input) <= 0 or int(input) > pages):
             print('Invalid input. Try again.')
             return False
         else:

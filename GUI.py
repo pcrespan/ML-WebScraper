@@ -23,29 +23,31 @@ class MLWebScraper(tk.Frame):
         # After executed, create new widgets
         page_number = tk.StringVar()
         text_label = tk.StringVar()
-        scraper.page_input = page_number.get()
         scraper.pages = scraper.total_pages(soup)
         scraper.prices = scraper.get_prices(soup)
 
-        self.pageLabel = tk.Label(self, text = f'Found {scraper.pages} pages. How many should be scraped? (Default: 1) ', textvariable = text_label)
-        self.pageField = tk.Entry(self, textvariable = page_number)
-        self.pageButton = tk.Button(self, text = 'Select', command = lambda : self.validate_input(scraper))
+        self.pageLabel = tk.Label(self, text = f"Found {scraper.pages} pages. How many should be scraped? (Default: 1) ", textvariable = text_label)
+        self.pageField = tk.Entry(self, text = "", textvariable = page_number)
+        self.pageButton = tk.Button(self, text = "Select", command = lambda : self.validate_input(scraper, page_number, soup, text_label))
 
         self.pageLabel.grid()
         self.pageField.grid()
         self.pageButton.grid()
 
 
-    def validate_input(self, scraper):
+    def validate_input(self, scraper, page_number, soup, text_label, counter = 1):
+        scraper.page_input = page_number.get()
         while True:
-            if scraper.check_input(scraper.page_input, scraper.pages):
+            if scraper.check_input(page_number.get(), scraper.pages):
                 self.pageLabel.grid_remove()
                 self.pageField.grid_remove()
                 self.pageButton.grid_remove()
+                Scraper.next_page(soup, scraper.prices, counter, int(scraper.page_input))
+                scraper.show_prices()
+                scraper.lowest_highest_prices()
                 break
             else:
-                self.text_label.set("Invalid input. Try again.")
-
+                text_label.set("Invalid input. Try again.")
 
 
     def createWidgets(self):
@@ -54,7 +56,7 @@ class MLWebScraper(tk.Frame):
         self.quitButton.grid()
         # Search field
         searchText = tk.StringVar()
-        self.searchField = tk.Entry(self, text='', textvariable = searchText)
+        self.searchField = tk.Entry(self, text="", textvariable = searchText)
         self.searchField.grid()
         # Search button. Only executes command when clicked
         self.searchButton = tk.Button(self, text="Search", command = lambda : self.exec(searchText))
