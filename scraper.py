@@ -185,6 +185,7 @@ class Scraper:
         print('Lowest and highest prices related to your search: ')
         # Creating dictionary that will store
         # product information
+        info_lst = []
         product_info = {}
         # Iterating through list of links (class attribute)
         for link in self.links:
@@ -210,10 +211,8 @@ class Scraper:
                 'link': product_link,
                 'price': price
             }
-            # Printing product info
-            print(f'Link: {product_info["link"]}')
-            print(f'Product: {product_info["title"]}')
-            print(f'Price: {product_info["price"]}')
+            info_lst.append(product_info)
+        return info_lst
 
 
     # Execute all functions

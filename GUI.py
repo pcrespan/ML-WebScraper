@@ -44,12 +44,26 @@ class MLWebScraper(tk.Frame):
                 self.pageField.grid_remove()
                 self.pageButton.grid_remove()
                 Scraper.next_page(soup, scraper.prices, counter, int(scraper.page_input))
-                scraper.show_prices()
-                scraper.lowest_highest_prices()
+                self.getLowHighPrices(scraper)
                 break
             else:
                 text_label.set("Invalid input. Try again.")
                 break
+        
+    def getLowHighPrices(self, scraper):
+        labelList = []
+        productList = scraper.lowest_highest_prices()
+
+        for product in productList:
+            title = f"Product: {product['title']}\n"
+            price = f"Price: {product['price']}\n"
+            link = f"Link: {product['link']}"
+            completeString = title + price + link
+            labelList.append(completeString)
+        lowestPrice = tk.Label(self, text=labelList[0])
+        highestPrice = tk.Label(self, text=labelList[1])
+        lowestPrice.grid()
+        highestPrice.grid()
 
 
     def createWidgets(self):
