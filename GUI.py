@@ -1,6 +1,7 @@
 import tkinter as tk
 from scraper import *
 from tkinter import *
+import webbrowser
 
 # (widget).grid_forget() will make it disappear
 
@@ -35,6 +36,9 @@ class MLWebScraper(tk.Frame):
         self.pageField.grid()
         self.pageButton.grid()
 
+    @staticmethod
+    def callback(url):
+        webbrowser.open_new(url)
 
     def validate_input(self, scraper, page_number, soup, text_label, counter = 1):
         scraper.page_input = page_number.get()
@@ -52,18 +56,31 @@ class MLWebScraper(tk.Frame):
         
     def getLowHighPrices(self, scraper):
         labelList = []
+        links = []
         productList = scraper.lowest_highest_prices()
 
         for product in productList:
             title = f"Product: {product['title']}\n"
-            price = f"Price: {product['price']}\n"
-            link = f"Link: {product['link']}"
-            completeString = title + price + link
+            price = f"Price: R${product['price']}\n"
+            completeString = title + price
             labelList.append(completeString)
+            links.append(product["link"])
+
         lowestPrice = tk.Label(self, text=labelList[0])
+        lowestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
+        lowestPriceLink.bind("<Button-1>", lambda event: self.callback(links[0]))
+        
         highestPrice = tk.Label(self, text=labelList[1])
+        highestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
+        highestPriceLink.bind("<Button-1>", lambda event: self.callback(links[1]))
+
+        avgPrice = tk.Label(self, text = f"The average price for {scraper.product} is R${Scraper.avg(scraper.prices):.2f}")
+        avgPrice.grid()
+
         lowestPrice.grid()
+        lowestPriceLink.grid()
         highestPrice.grid()
+        highestPriceLink.grid()
 
 
     def createWidgets(self):
