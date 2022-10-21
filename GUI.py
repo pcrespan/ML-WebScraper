@@ -1,4 +1,5 @@
 import tkinter as tk
+from xml.dom.minidom import Attr
 from scraper import *
 from tkinter import *
 import webbrowser
@@ -24,25 +25,43 @@ class MLWebScraper(tk.Frame):
         scraper = Scraper(product)   
         soup, response = Scraper.send(str(searchText.get()))
         valid, msg = Scraper.valid_response(response)
-        if not valid:
+        try:
+            if not valid and self.errorLabel:
+                return
+            # Need to add the case when it's valid and there's a server error
+            else:
+                try:
+                    self.errorLabel.grid_remove()
+                    pass
+                except AttributeError:
+                    pass
+        except AttributeError:
             self.errorLabel = tk.Label(self, text = msg)
             self.errorLabel.grid()
             return
-        self.errorLabel.grid_remove()
 
         # After executed, create new widgets
+        self.createPageWidgets(scraper, soup)
+
+
+    def createPageWidgets(self, scraper, soup):
         page_number = tk.StringVar()
         text_label = tk.StringVar()
         scraper.pages = scraper.total_pages(soup)
         scraper.prices = scraper.get_prices(soup)
 
-        self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
-        self.pageField = tk.Entry(self, text = "", textvariable = page_number)
-        self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
+        try:
+            if self.pageButton and self.pageField and self.pageLabel:
+                pass
+        except AttributeError:
+            self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
+            self.pageField = tk.Entry(self, text = "", textvariable = page_number)
+            self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
 
-        self.pageLabel.grid()
-        self.pageField.grid()
-        self.pageButton.grid()
+            self.pageLabel.grid()
+            self.pageField.grid()
+            self.pageButton.grid()
+
 
     @staticmethod
     def callback(url):
