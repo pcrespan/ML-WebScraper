@@ -51,16 +51,28 @@ class MLWebScraper(tk.Frame):
 
     def scrape(self, scraper, page_number, soup, text_label, counter = 1):
         while True:
-            if self.validate_input(scraper, page_number):
-                self.pageLabel.grid_remove()
-                self.pageField.grid_remove()
-                self.pageButton.grid_remove()
-                Scraper.next_page(soup, scraper.prices, counter, int(scraper.page_input))
-                self.getLowHighPrices(scraper)
-                break
-            else:
-                text_label.set("Invalid input. Try again.")
-                break
+            match self.validate_input(scraper, page_number):
+                case 0:
+                    self.hideWidgets()
+                    Scraper.next_page(soup, scraper.prices, counter, int(scraper.page_input))
+                    self.getLowHighPrices(scraper)
+                    # Add search again button
+                    break
+                case -1:
+                    text_label.set("Invalid input. Try again.")
+                    break
+                case 1:
+                    self.hideWidgets()
+                    self.getLowHighPrices(scraper)
+                    break
+
+    
+    def hideWidgets(self):
+        self.searchField.grid_remove()
+        self.searchButton.grid_remove()
+        self.pageLabel.grid_remove()
+        self.pageField.grid_remove()
+        self.pageButton.grid_remove()
 
 
     def getLowHighPrices(self, scraper):
@@ -75,6 +87,10 @@ class MLWebScraper(tk.Frame):
             labelList.append(completeString)
             links.append(product["link"])
 
+        self.createPriceWidgets(links, labelList, scraper)
+    
+
+    def createPriceWidgets(self, links, labelList, scraper):
         lowestPrice = tk.Label(self, text=labelList[0])
         lowestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
         lowestPriceLink.bind("<Button-1>", lambda event: self.callback(links[0]))

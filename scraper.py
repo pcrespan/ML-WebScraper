@@ -96,24 +96,20 @@ class Scraper:
         return int(pages.group(1))
 
 
-    # Checks for user input. Returns false for invalid
-    # input and True for inputs valid and different from one
+    # Checks for user input. Returns -1 for invalid
+    # input, 0 for valid, and 1 for default 
     def check_input(self, input, pages):
         # Checking if input is not empty, is not a character
         # and is not bigger than the total amount of pages found
         if input and (input.isalpha() or int(input) <= 0 or int(input) > pages):
             print('Invalid input. Try again.')
-            return False
+            return -1
         else:
             # Testing for the case the input is equal 
             # to the default value or empty
-            print(input)
             if input == '1' or not input:
-                print('Using default value...')
-                self.show_prices()
-                self.lowest_highest_prices()
-                sys.exit(0)
-            return True
+                return 1
+            return 0
 
 
     # Calculates average price, returns a float
