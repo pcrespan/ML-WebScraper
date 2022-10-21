@@ -16,12 +16,20 @@ class MLWebScraper(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.pack()
-        self.createWidgets()
+        self.createSearchWidgets()
+
 
     def exec(self, searchText):
-        scraper = Scraper(str(searchText.get()))   
+        product = Searcher.search(str(searchText.get()))
+        scraper = Scraper(product)   
         soup, response = Scraper.send(str(searchText.get()))
-        Scraper.valid_response(response)
+        valid, msg = Scraper.valid_response(response)
+        if not valid:
+            self.errorLabel = tk.Label(self, text = msg)
+            self.errorLabel.grid()
+            return
+        self.errorLabel.grid_remove()
+
         # After executed, create new widgets
         page_number = tk.StringVar()
         text_label = tk.StringVar()
@@ -91,24 +99,24 @@ class MLWebScraper(tk.Frame):
     
 
     def createPriceWidgets(self, links, labelList, scraper):
-        lowestPrice = tk.Label(self, text=labelList[0])
-        lowestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
-        lowestPriceLink.bind("<Button-1>", lambda event: self.callback(links[0]))
+        self.lowestPrice = tk.Label(self, text=labelList[0])
+        self.lowestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
+        self.lowestPriceLink.bind("<Button-1>", lambda event: self.callback(links[0]))
         
-        highestPrice = tk.Label(self, text=labelList[1])
-        highestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
-        highestPriceLink.bind("<Button-1>", lambda event: self.callback(links[1]))
+        self.highestPrice = tk.Label(self, text=labelList[1])
+        self.highestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
+        self.highestPriceLink.bind("<Button-1>", lambda event: self.callback(links[1]))
 
-        avgPrice = tk.Label(self, text = f"The average price for {scraper.product} is R${Scraper.avg(scraper.prices):.2f}")
-        avgPrice.grid()
+        self.avgPrice = tk.Label(self, text = f"The average price for {scraper.product} is R${Scraper.avg(scraper.prices):.2f}")
+        self.avgPrice.grid()
 
-        lowestPrice.grid()
-        lowestPriceLink.grid()
-        highestPrice.grid()
-        highestPriceLink.grid()
+        self.lowestPrice.grid()
+        self.lowestPriceLink.grid()
+        self.highestPrice.grid()
+        self.highestPriceLink.grid()
 
 
-    def createWidgets(self):
+    def createSearchWidgets(self):
         # Quit button
         self.quitButton = tk.Button(self, text="Quit", command = self.quit)
         self.quitButton.grid()

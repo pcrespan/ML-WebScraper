@@ -55,16 +55,19 @@ class Scraper:
     # Sends request for specific link, returns soup object
     @staticmethod
     def send(product='', link='https://lista.mercadolivre.com.br/'):
-        # Sending GET request for a specific link, default value
-        # is the first page of any product that the user inputs
-        response = requests.get(link + product, headers=HEADERS)
-        # Default value of response is its code (200, 404 etc),
-        # using BeautifulSoup to parse its actual content and
-        # find specific elements on the page
-        soup = BeautifulSoup(response.content, 'html.parser')
-        print(response)
-        # Returning soup object
-        return soup, response
+        try:
+            # Sending GET request for a specific link, default value
+            # is the first page of any product that the user inputs
+            response = requests.get(link + product, headers=HEADERS)
+            # Default value of response is its code (200, 404 etc),
+            # using BeautifulSoup to parse its actual content and
+            # find specific elements on the page
+            soup = BeautifulSoup(response.content, 'html.parser')
+            print(response)
+            # Returning soup object
+            return soup, response
+        except ConnectionError:
+            print("Connection error")
 
 
     # Gets all the prices of the current page, returns a list
@@ -161,13 +164,13 @@ class Scraper:
     def valid_response(response):
         match response.status_code:
             case 200:
-                logging.info('Success')
+                return True, logging.info('Success')
             case 404:
-                logging.error('Product not found. Exitting...')
-                sys.exit(1)
+                return False, 'Product not found.'
             case 503:
-                logging.error('Server error')
-                sys.exit(1)
+                return False, 'Server error'
+            case 500:
+                return False, 'Server error'
     
 
     # Prints average price
