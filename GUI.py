@@ -24,6 +24,14 @@ class MLWebScraper(tk.Frame):
         product = Searcher.search(str(searchText.get()))
         scraper = Scraper(product)   
         soup, response = Scraper.send(str(searchText.get()))
+
+        if response.status_code == 200:
+            self.searchField.grid_forget()
+            self.searchButton.grid_remove()
+            pass
+        else:
+            return
+
         valid, msg = Scraper.valid_response(response)
         try:
             if not valid and self.errorLabel:
