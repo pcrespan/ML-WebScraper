@@ -1,5 +1,4 @@
 import tkinter as tk
-from xml.dom.minidom import Attr
 from scraper import *
 from tkinter import *
 import webbrowser
@@ -25,13 +24,6 @@ class MLWebScraper(tk.Frame):
         scraper = Scraper(product)   
         soup, response = Scraper.send(str(searchText.get()))
 
-        if response.status_code == 200:
-            self.searchField.forget()
-            self.searchButton.forget()
-            pass
-        else:
-            return
-
         valid, msg = Scraper.valid_response(response)
         try:
             if not valid and self.errorLabel:
@@ -39,7 +31,7 @@ class MLWebScraper(tk.Frame):
             # Need to add the case when it's valid and there's a server error
             else:
                 try:
-                    self.errorLabel.grid_remove()
+                    self.errorLabel.forget()
                     pass
                 except AttributeError:
                     pass
@@ -47,6 +39,9 @@ class MLWebScraper(tk.Frame):
             self.errorLabel = tk.Label(self, text = msg)
             self.errorLabel.pack()
             return
+
+        self.searchField.forget()
+        self.searchButton.forget()
 
         # After executed, create new widgets
         self.createPageWidgets(scraper, soup)
@@ -65,7 +60,6 @@ class MLWebScraper(tk.Frame):
             self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
             self.pageField = tk.Entry(self, text = "", textvariable = page_number)
             self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
-            self.quitButton.forget()
             self.quitButton.pack(padx=5, pady=15, side=tk.RIGHT)
 
             self.pageLabel.pack(pady=40)
@@ -78,20 +72,12 @@ class MLWebScraper(tk.Frame):
         webbrowser.open_new(url)
 
 
-    def validate_input(self, scraper, page_number):
-        scraper.page_input = page_number.get()
-        if scraper.check_input(page_number.get(), scraper.pages):
-            return True
-        else:
-            return False
-
-
     def scrape(self, scraper, page_number, soup, text_label, counter = 1):
         while True:
-            match self.validate_input(scraper, page_number):
+            match scraper.check_input(page_number.get(), scraper.pages):
                 case 0:
                     self.hideWidgets()
-                    Scraper.next_page(soup, scraper.prices, counter, int(scraper.page_input))
+                    Scraper.next_page(soup, scraper.prices, counter, int(page_number.get()))
                     self.getLowHighPrices(scraper)
                     # Add search again button
                     break
@@ -105,11 +91,11 @@ class MLWebScraper(tk.Frame):
 
     
     def hideWidgets(self):
-        self.searchField.grid_remove()
-        self.searchButton.grid_remove()
-        self.pageLabel.grid_remove()
-        self.pageField.grid_remove()
-        self.pageButton.grid_remove()
+        self.searchField.forget()
+        self.searchButton.forget()
+        self.pageLabel.forget()
+        self.pageField.forget()
+        self.pageButton.forget()
 
 
     def getLowHighPrices(self, scraper):
