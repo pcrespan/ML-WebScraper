@@ -6,7 +6,7 @@ import webbrowser
 
 # (widget).grid_forget() will make it disappear
 
-# You can use (widget).grid() to make it reappear,
+# You can use (widget).pack() to make it reappear,
 # but it won't remember the parameters of it
 
 # Instead of grid_forget(), use grid_remove(), because
@@ -26,8 +26,8 @@ class MLWebScraper(tk.Frame):
         soup, response = Scraper.send(str(searchText.get()))
 
         if response.status_code == 200:
-            self.searchField.grid_forget()
-            self.searchButton.grid_remove()
+            self.searchField.forget()
+            self.searchButton.forget()
             pass
         else:
             return
@@ -45,7 +45,7 @@ class MLWebScraper(tk.Frame):
                     pass
         except AttributeError:
             self.errorLabel = tk.Label(self, text = msg)
-            self.errorLabel.grid()
+            self.errorLabel.pack()
             return
 
         # After executed, create new widgets
@@ -65,10 +65,12 @@ class MLWebScraper(tk.Frame):
             self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
             self.pageField = tk.Entry(self, text = "", textvariable = page_number)
             self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
+            self.quitButton.forget()
+            self.quitButton.pack(padx=5, pady=15, side=tk.RIGHT)
 
-            self.pageLabel.grid()
-            self.pageField.grid()
-            self.pageButton.grid()
+            self.pageLabel.pack(pady=40)
+            self.pageField.pack(pady=10)
+            self.pageButton.pack(pady=10, side=tk.RIGHT)
 
 
     @staticmethod
@@ -135,25 +137,25 @@ class MLWebScraper(tk.Frame):
         self.highestPriceLink.bind("<Button-1>", lambda event: self.callback(links[1]))
 
         self.avgPrice = tk.Label(self, text = f"The average price for {scraper.product} is R${Scraper.avg(scraper.prices):.2f}")
-        self.avgPrice.grid()
+        self.avgPrice.pack()
 
-        self.lowestPrice.grid()
-        self.lowestPriceLink.grid()
-        self.highestPrice.grid()
-        self.highestPriceLink.grid()
+        self.lowestPrice.pack()
+        self.lowestPriceLink.pack()
+        self.highestPrice.pack()
+        self.highestPriceLink.pack()
 
 
     def createSearchWidgets(self):
         # Quit button
         self.quitButton = tk.Button(self, text="Quit", command = self.quit)
-        self.quitButton.grid()
+        self.quitButton.pack(padx=8, pady=15, side=tk.RIGHT)
         # Search field
         searchText = tk.StringVar()
         self.searchField = tk.Entry(self, text="", textvariable = searchText)
-        self.searchField.grid()
+        self.searchField.pack(padx=5, pady=100, side=tk.LEFT)
         # Search button. Only executes command when clicked
         self.searchButton = tk.Button(self, text="Search", command = lambda : self.exec(searchText))
-        self.searchButton.grid()
+        self.searchButton.pack(padx=5, pady=100, side=tk.LEFT)
 
  
 app = MLWebScraper()
