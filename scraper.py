@@ -93,9 +93,14 @@ class Scraper:
         # Finding number of pages
         total_pages = soup.find('li', class_='andes-pagination__page-count')
         # Cleaning text and returning in the form of an integer
-        pages = re.search(r'(\d+)', total_pages.text)
+        try:
+            pages = re.search(r'(\d+)', total_pages.text)
+            pages = int(pages.group(1))
+        except AttributeError:
+            pages = 1
+
         # Waiting for user input. If it's invalid, prompt it again
-        return int(pages.group(1))
+        return pages
 
 
     # Checks for user input. Returns -1 for invalid
@@ -193,9 +198,14 @@ class Scraper:
             Scraper.valid_response(response)
             # Finding HTML element that contains product
             # information (link and title)
-            info = soup.find('a', class_= 'ui-search-result__content ui-search-link')
-            product_link = info['href']
-            product_title = info['title']
+            try:
+                info = soup.find('a', class_= 'ui-search-result__content ui-search-link')
+                product_link = info['href']
+                product_title = info['title']
+            except TypeError:
+                info = soup.find('a', class_='ui-search-item__group__element shops__items-group-details ui-search-link')
+                product_link = info['href']
+                product_title = info['title']
             # Finding div that contains product price
             div = soup.find('div', class_='ui-search-price ui-search-price--size-medium shops__price')
             # Searching inside of div to find span that

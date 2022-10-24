@@ -45,12 +45,10 @@ class MLWebScraper(tk.Frame):
         self.searchButton.pack_forget()
 
         # After executed, create new widgets
-        print("tchens")
         self.createPageWidgets(scraper, soup)
 
 
     def createPageWidgets(self, scraper, soup):
-        print("rodou")
         page_number = tk.StringVar()
         text_label = tk.StringVar()
         scraper.pages = scraper.total_pages(soup)
@@ -58,11 +56,8 @@ class MLWebScraper(tk.Frame):
 
         try:
             if self.pageButton and self.pageField and self.pageLabel:
-                print("bichou")
-                print(self.pageButton)
                 pass
         except AttributeError:
-            print("isso aqui ta peidado")
             self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
             self.pageField = tk.Entry(self, text = "", textvariable = page_number)
             self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
