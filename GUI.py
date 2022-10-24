@@ -31,7 +31,8 @@ class MLWebScraper(tk.Frame):
             # Need to add the case when it's valid and there's a server error
             else:
                 try:
-                    self.errorLabel.forget()
+                    self.errorLabel.pack_forget()
+                    del self.errorLabel
                     pass
                 except AttributeError:
                     pass
@@ -40,14 +41,16 @@ class MLWebScraper(tk.Frame):
             self.errorLabel.pack()
             return
 
-        self.searchField.forget()
-        self.searchButton.forget()
+        self.searchField.pack_forget()
+        self.searchButton.pack_forget()
 
         # After executed, create new widgets
+        print("tchens")
         self.createPageWidgets(scraper, soup)
 
 
     def createPageWidgets(self, scraper, soup):
+        print("rodou")
         page_number = tk.StringVar()
         text_label = tk.StringVar()
         scraper.pages = scraper.total_pages(soup)
@@ -55,16 +58,23 @@ class MLWebScraper(tk.Frame):
 
         try:
             if self.pageButton and self.pageField and self.pageLabel:
+                print("bichou")
+                print(self.pageButton)
                 pass
         except AttributeError:
+            print("isso aqui ta peidado")
             self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
             self.pageField = tk.Entry(self, text = "", textvariable = page_number)
             self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
-            self.quitButton.pack(padx=5, pady=15, side=tk.RIGHT)
+            self.quitButton.pack_forget()
+            self.pageLabel.pack_forget()
+            self.pageField.pack_forget()
+            self.pageButton.pack_forget()
 
-            self.pageLabel.pack(pady=40)
-            self.pageField.pack(pady=10)
-            self.pageButton.pack(pady=10, side=tk.RIGHT)
+            self.quitButton.pack(padx=5, pady=20, anchor=tk.E)
+            self.pageLabel.pack(padx=2, pady=40)
+            self.pageField.pack(pady=10)    
+            self.pageButton.pack(padx=5, pady=10, anchor=tk.E)
 
 
     @staticmethod
@@ -79,6 +89,8 @@ class MLWebScraper(tk.Frame):
                     self.hideWidgets()
                     Scraper.next_page(soup, scraper.prices, counter, int(page_number.get()))
                     self.getLowHighPrices(scraper)
+                    self.searchAgain = tk.Button(self, text="Search again", command= lambda :self.searchAgain_func())
+                    self.searchAgain.pack()
                     # Add search again button
                     break
                 case -1:
@@ -87,15 +99,35 @@ class MLWebScraper(tk.Frame):
                 case 1:
                     self.hideWidgets()
                     self.getLowHighPrices(scraper)
+                    self.searchAgain = tk.Button(self, text="Search again", command= lambda :self.searchAgain_func())
+                    self.searchAgain.pack()
                     break
+
+    def searchAgain_func(self):
+        self.quitButton.pack_forget()
+        self.avgPrice.pack_forget()
+        self.lowestPrice.pack_forget()
+        self.lowestPriceLink.pack_forget()
+        self.highestPrice.pack_forget()
+        self.highestPriceLink.pack_forget()
+        self.searchAgain.pack_forget()
+
+        # Re-creating search widgets
+        self.createSearchWidgets()
 
     
     def hideWidgets(self):
-        self.searchField.forget()
-        self.searchButton.forget()
-        self.pageLabel.forget()
-        self.pageField.forget()
-        self.pageButton.forget()
+        self.searchField.pack_forget()
+        self.searchButton.pack_forget()
+        self.pageLabel.pack_forget()
+        self.pageField.pack_forget()
+        self.pageButton.pack_forget()
+
+        del self.searchField
+        del self.searchButton
+        del self.pageLabel
+        del self.pageField
+        del self.pageButton
 
 
     def getLowHighPrices(self, scraper):
