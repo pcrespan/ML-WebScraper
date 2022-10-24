@@ -61,15 +61,14 @@ class MLWebScraper(tk.Frame):
             self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
             self.pageField = tk.Entry(self, text = "", textvariable = page_number)
             self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
-            self.quitButton.pack_forget()
             self.pageLabel.pack_forget()
             self.pageField.pack_forget()
             self.pageButton.pack_forget()
 
-            self.quitButton.pack(padx=5, pady=20, anchor=tk.E)
+            self.quitButton.pack(padx=5, pady=10, side=tk.BOTTOM)
             self.pageLabel.pack(padx=2, pady=40)
-            self.pageField.pack(pady=10)    
-            self.pageButton.pack(padx=5, pady=10, anchor=tk.E)
+            self.pageField.pack(padx=5)
+            self.pageButton.pack(padx=5, pady=10, side=tk.BOTTOM)
 
 
     @staticmethod
