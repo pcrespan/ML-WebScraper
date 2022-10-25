@@ -88,6 +88,8 @@ class MLWebScraper(tk.Frame):
                     break
 
     def searchAgain_func(self):
+        self.lowestLabel.pack_forget()
+        self.highestLabel.pack_forget()
         self.quitButton.pack_forget()
         self.avgPrice.pack_forget()
         self.lowestPrice.pack_forget()
@@ -130,21 +132,26 @@ class MLWebScraper(tk.Frame):
     
 
     def createPriceWidgets(self, links, labelList, scraper):
+        self.lowestLabel = tk.Label(self, text="Lowest price", font="bold")
         self.lowestPrice = tk.Label(self, text=labelList[0])
         self.lowestPriceLink = tk.Label(self, text = "Link", cursor = "hand2", fg="blue")
         self.lowestPriceLink.bind("<Button-1>", lambda event: self.callback(links[0]))
         
+        self.highestLabel = tk.Label(self, text="Highest price", font="bold")
         self.highestPrice = tk.Label(self, text=labelList[1])
         self.highestPriceLink = tk.Label(self, text = "Link", cursor = "hand2", fg="blue")
         self.highestPriceLink.bind("<Button-1>", lambda event: self.callback(links[1]))
 
-        self.avgPrice = tk.Label(self, text = f"The average price for {scraper.product} is R${Scraper.avg(scraper.prices):.2f}")
+        self.avgPrice = tk.Label(self, text = f"Average price: R${Scraper.avg(scraper.prices):.2f}", font="bold")
         self.avgPrice.pack(pady=20)
 
+        self.lowestLabel.pack(pady=10)
         self.lowestPrice.pack()
-        self.lowestPriceLink.pack()
+        self.lowestPriceLink.pack(pady=5)
+
+        self.highestLabel.pack(pady=10)
         self.highestPrice.pack()
-        self.highestPriceLink.pack()
+        self.highestPriceLink.pack(pady=5)
 
 
     def createSearchWidgets(self):
