@@ -1,6 +1,8 @@
 import tkinter as tk
+import tkinter
 from scraper import *
 from tkinter import *
+from tkinter import messagebox
 import webbrowser
 
 # (widget).grid_forget() will make it disappear
@@ -25,20 +27,8 @@ class MLWebScraper(tk.Frame):
         soup, response = Scraper.send(str(searchText.get()))
 
         valid, msg = Scraper.valid_response(response)
-        try:
-            if not valid and self.errorLabel:
-                return
-            # Need to add the case when it's valid and there's a server error
-            else:
-                try:
-                    self.errorLabel.pack_forget()
-                    del self.errorLabel
-                    pass
-                except AttributeError:
-                    pass
-        except AttributeError:
-            self.errorLabel = tk.Label(self, text = msg)
-            self.errorLabel.pack()
+        if not valid:
+            tkinter.messagebox.showerror(title="Error", message=msg)
             return
 
         self.searchField.pack_forget()
