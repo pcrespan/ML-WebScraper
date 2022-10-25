@@ -167,7 +167,7 @@ class Scraper:
     def valid_response(response):
         match response.status_code:
             case 200:
-                return True, logging.info('Success')
+                return True, 'Success'
             case 404:
                 return False, 'Product not found.'
             case 503:

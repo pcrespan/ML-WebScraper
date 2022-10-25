@@ -50,7 +50,7 @@ class MLWebScraper(tk.Frame):
         except AttributeError:
             self.pageLabel = tk.Label(self, text = text_label.set(f"Found {scraper.pages} pages. How many should be scraped? (Default: 1)"), textvariable = text_label)
             self.pageField = tk.Entry(self, text = "", textvariable = page_number)
-            self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup, text_label))
+            self.pageButton = tk.Button(self, text = "Select", command = lambda : self.scrape(scraper, page_number, soup))
             self.pageLabel.pack_forget()
             self.pageField.pack_forget()
             self.pageButton.pack_forget()
@@ -66,7 +66,7 @@ class MLWebScraper(tk.Frame):
         webbrowser.open_new(url)
 
 
-    def scrape(self, scraper, page_number, soup, text_label, counter = 1):
+    def scrape(self, scraper, page_number, soup, counter = 1):
         while True:
             match scraper.check_input(page_number.get(), scraper.pages):
                 case 0:
@@ -74,11 +74,11 @@ class MLWebScraper(tk.Frame):
                     Scraper.next_page(soup, scraper.prices, counter, int(page_number.get()))
                     self.getLowHighPrices(scraper)
                     self.searchAgain = tk.Button(self, text="Search again", command= lambda :self.searchAgain_func())
-                    self.searchAgain.pack()
+                    self.searchAgain.pack(pady=10)
                     # Add search again button
                     break
                 case -1:
-                    text_label.set("Invalid input. Try again.")
+                    tkinter.messagebox.showerror(title="Error", message="Invalid input. Try again.")
                     break
                 case 1:
                     self.hideWidgets()
