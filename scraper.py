@@ -184,7 +184,6 @@ class Scraper:
     # NEEDS BETTER DESIGN
     # Finds max and min prices, prints product information
     def lowest_highest_prices(self):
-        print('Lowest and highest prices related to your search: ')
         # Creating dictionary that will store
         # product information
         info_lst = []
