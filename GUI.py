@@ -131,15 +131,15 @@ class MLWebScraper(tk.Frame):
 
     def createPriceWidgets(self, links, labelList, scraper):
         self.lowestPrice = tk.Label(self, text=labelList[0])
-        self.lowestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
+        self.lowestPriceLink = tk.Label(self, text = "Link", cursor = "hand2", fg="blue")
         self.lowestPriceLink.bind("<Button-1>", lambda event: self.callback(links[0]))
         
         self.highestPrice = tk.Label(self, text=labelList[1])
-        self.highestPriceLink = tk.Label(self, text = "Link", cursor = "hand2")
+        self.highestPriceLink = tk.Label(self, text = "Link", cursor = "hand2", fg="blue")
         self.highestPriceLink.bind("<Button-1>", lambda event: self.callback(links[1]))
 
         self.avgPrice = tk.Label(self, text = f"The average price for {scraper.product} is R${Scraper.avg(scraper.prices):.2f}")
-        self.avgPrice.pack()
+        self.avgPrice.pack(pady=20)
 
         self.lowestPrice.pack()
         self.lowestPriceLink.pack()
