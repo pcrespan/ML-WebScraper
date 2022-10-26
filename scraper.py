@@ -121,10 +121,8 @@ class Scraper:
     # Calculates average price, returns a float
     @staticmethod
     def avg(values):
-        sum = 0
-        for value in values:
-            sum = sum + value
-        return sum / len(values)
+        sumValues = sum(values)
+        return sumValues / len(values)
     
 
     # Navigates through next pages, returns list of prices
