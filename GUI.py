@@ -5,14 +5,6 @@ from tkinter import *
 from tkinter import messagebox
 import webbrowser
 
-# (widget).grid_forget() will make it disappear
-
-# You can use (widget).pack() to make it reappear,
-# but it won't remember the parameters of it
-
-# Instead of grid_forget(), use grid_remove(), because
-# it will remember all of the parameters
-
 
 class MLWebScraper(tk.Frame):
     def __init__(self, master=None):
